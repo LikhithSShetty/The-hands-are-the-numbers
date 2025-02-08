@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .clock-container {
+            width: 400px;
+            height: 400px;
+            position: relative;
+            margin: 50px auto;
+        }
+
+        .clock-face {
+            width: 100%;
+            height: 100%;
+            border: 2px solid black;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .number-container {
+            position: absolute;
+            transform-origin: bottom center;
+            width: 30px;
+            text-align: center;
+            bottom: 50%;
+            left: calc(50% - 15px);
+        }
+
+        .clock-number {
+            position: absolute;
+            width: 30px;
+            text-align: center;
+            transform-origin: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="clock-container">
+        <div class="clock-face">
+            <div id="hour-hand" class="number-container"></div>
+            <div id="minute-hand" class="number-container"></div>
+            <div id="second-hand" class="number-container"></div>
+        </div>
+    </div>
+
+    <script>
+        function createNumberHand(value, length, fontSize) {
+            const numbers = [];
+            const spacing = length / 10;
+            
+            for(let i = 0; i < 10; i++) {
+                const number = document.createElement('div');
+                number.className = 'clock-number';
+                number.textContent = value;
+                number.style.bottom = `${i * spacing}px`;
+                number.style.fontSize = `${fontSize}px`;
+                numbers.push(number);
+            }
+            return numbers;
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours() % 12;
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+
+            // Clear previous numbers
+            document.getElementById('hour-hand').innerHTML = '';
+            document.getElementById('minute-hand').innerHTML = '';
+            document.getElementById('second-hand').innerHTML = '';
+
+            // Create new number hands
+            const hourNumbers = createNumberHand(hours, 100, 14);
+            const minuteNumbers = createNumberHand(minutes, 150, 12);
+            const secondNumbers = createNumberHand(seconds, 180, 10);
+
+            // Calculate rotations
+            const hourRotation = (hours * 30) + (minutes / 2) - 90;
+            const minuteRotation = (minutes * 6) - 90;
+            const secondRotation = (seconds * 6) - 90;
+
+            // Apply rotations to hands and counter-rotate numbers
+            const hourHand = document.getElementById('hour-hand');
+            hourHand.style.transform = `rotate(${hourRotation}deg)`;
+            hourNumbers.forEach(num => {
+                num.style.transform = `rotate(${-hourRotation}deg)`;
+                hourHand.appendChild(num);
+            });
+
+            const minuteHand = document.getElementById('minute-hand');
+            minuteHand.style.transform = `rotate(${minuteRotation}deg)`;
+            minuteNumbers.forEach(num => {
+                num.style.transform = `rotate(${-minuteRotation}deg)`;
+                minuteHand.appendChild(num);
+            });
+
+            const secondHand = document.getElementById('second-hand');
+            secondHand.style.transform = `rotate(${secondRotation}deg)`;
+            secondNumbers.forEach(num => {
+                num.style.transform = `rotate(${-secondRotation}deg)`;
+                secondHand.appendChild(num);
+            });
+        }
+
+        // Update clock every second
+        setInterval(updateClock, 1000);
+        updateClock(); // Initial update
+    </script>
+</body>
+</html>
